@@ -1,3 +1,397 @@
+/* 
+ * File:   pic16flib_conf.h
+ * Author: ozenozkaya
+ *
+ * Created on 25 Eylül 2015 Cuma, 00:46
+ */
+
+
+#define MAX_INT_CALLBACK_NUM (5)
+
+#define PIC16LIB_USE_RB0_INT
+#define PIC16LIB_USE_PORTB_INT
+#define PIC16LIB_USE_TIMER0_INT
+
+
+
+/* 
+ * File:   pic16f84a_lib.h
+ * Author: ozenozkaya
+ *
+ * Created on 20 Temmuz 2015 Pazartesi, 00:05
+ */
+
+
+ 
+#include <stdint.h>
+    
+#define PIC16LIB_ERROR_NONE     (0)
+#define PIC16LIB_ERROR_CB_NULL  (-1)
+#define PIC16LIB_ERROR_CB_ALREADY_REGISTERED (-2)
+
+#define F_OSC (1000000UL)
+    
+#define REG_TIMER0_ADDR (0x01)
+#define REG_TIMER0 (*( volatile unsigned char*)REG_TIMER0_ADDR)
+    
+#define REG_TRISB_ADDR (0x86)
+#define REG_TRISB (*( volatile unsigned char*)REG_TRISB_ADDR)
+ 
+#define REG_TRISA_ADDR (0x85)
+#define REG_TRISA (*( volatile unsigned char*)REG_TRISA_ADDR)
+    
+#define TRIS_PIN_OUTPUT (0)
+#define TRIS_PIN_INPUT  (1)
+#define TRIS_PORT_OUTPUT (0)
+#define TRIS_PORT_INPUT  (0xFF)
+
+#define REG_PORTB_ADDR (0x06)
+#define REG_PORTB (*( volatile unsigned char*)REG_PORTB_ADDR)
+    
+#define REG_PORTA_ADDR (0x05)
+#define REG_PORTA (*( volatile unsigned char*)REG_PORTA_ADDR)
+
+#define PORT_PIN_LOW  (0)
+#define PORT_PIN_HIGH (1)
+#define PORT_ALL_LOW  (0)
+#define PORT_ALL_HIGH (0xFF)
+
+#define REG_INTCON_ADDR (0x0B)
+#define REG_INTCON (*( volatile unsigned char*)REG_INTCON_ADDR)
+#define INT_ENABLE (1)
+#define INT_ENABLE_ALL (0xFF)
+#define INT_DISABLE (0)
+#define INT_DISABLE_ALL (0)
+#define INT_FLAG_CLEAR (0)
+
+#define REG_OPTION_ADDR (0x81)
+#define REG_OPTION (*( volatile unsigned char*)REG_OPTION_ADDR)
+#define INT_EDGE_FALLING (0)
+#define INT_EDGE_RISING  (1)
+    
+
+
+typedef struct 
+{
+    //one bit is stored in one BYTE
+    uint8_t pin0:1;
+    uint8_t pin1:1;
+    uint8_t pin2:1;
+    uint8_t pin3:1;
+    uint8_t pin4:1;
+    uint8_t pin5:1;
+    uint8_t pin6:1;
+    uint8_t pin7:1;
+}_tris_port_pin_t, *_tris_port_pin_ptr_t;
+
+typedef struct
+{
+    uint8_t RBIF:1;
+    uint8_t INTF:1;
+    uint8_t T0IF:1;
+    uint8_t RBIE:1;
+    uint8_t INTE:1;
+    uint8_t T0IE:1;
+    uint8_t EEIE:1;
+    uint8_t GIE:1;
+}_intcon_reg_t,*_intcon_reg_ptr_t;
+
+typedef struct
+{
+    uint8_t PS:3;
+    uint8_t PSA:1;
+    uint8_t T0SE:1;
+    uint8_t T0CS:1;
+    uint8_t INTEDG:1;
+    uint8_t RBPU:1;
+}_option_reg_t,*_option_reg_ptr_t;
+
+typedef union
+{
+    _tris_port_pin_t pins;
+    uint8_t port;
+}tris_port_t,*tris_port_ptr_t;
+#define REG_TRISA_UNION (*(tris_port_ptr_t)REG_TRISA_ADDR) 
+#define REG_TRISB_UNION (*(tris_port_ptr_t)REG_TRISB_ADDR) 
+#define REG_PORTA_UNION (*(tris_port_ptr_t)REG_PORTA_ADDR) 
+#define REG_PORTB_UNION (*(tris_port_ptr_t)REG_PORTB_ADDR) 
+
+typedef union
+{
+  _option_reg_t bits;
+  uint8_t value;  
+}option_reg_t, *option_reg_ptr_t;
+#define T0CS_SOURCE_RA4_T0CKI_PIN (0x01)
+#define T0CS_SOURCE_INTERNAL_CLOCK (0x00)
+
+#define PSA_ASSIGN_TO_WATCHDOG  (0x01)
+#define PSA_ASSIGN_TO_TIMER0    (0x00)
+
+#define PS_TMR0_RATE_DIVIDE_2   (0x00)
+#define PS_TMR0_RATE_DIVIDE_4   (0x01)
+#define PS_TMR0_RATE_DIVIDE_8   (0x02)
+#define PS_TMR0_RATE_DIVIDE_16   (0x03)
+#define PS_TMR0_RATE_DIVIDE_32   (0x04)
+#define PS_TMR0_RATE_DIVIDE_64   (0x05)
+#define PS_TMR0_RATE_DIVIDE_128   (0x06)
+#define PS_TMR0_RATE_DIVIDE_256   (0x07)
+
+#define REG_OPTION_UNION (*(option_reg_ptr_t)REG_OPTION_ADDR) 
+
+typedef union
+{
+  _intcon_reg_t bits;
+  uint8_t value;  
+}intcon_reg_t, *intcon_reg_ptr_t;
+#define REG_INTCON_UNION   (*(intcon_reg_ptr_t)REG_INTCON_ADDR)
+
+typedef union
+{
+    uint8_t value;
+    uint8_t count;
+}timer0_reg_t, *timer0_reg_ptr_t;
+#define TIMER0_MAX_CNT (0xFF)
+#define TIMER0_ASSIGN_CNT(NEW_TMR0_CNT)    (TIMER0_MAX_CNT-NEW_TMR0_CNT)
+#define REG_TIMER0_UNION   (*(timer0_reg_ptr_t)REG_TIMER0_ADDR)
+
+#define WAIT_LOOP_FOREVER()  while(1)
+
+#ifdef PIC16LIB_USE_RB0_INT
+typedef void (*rb0_int_callback_t)();
+int8_t register_rb0_int_callback(rb0_int_callback_t new_cb);
+int8_t unregister_rb0_int_callback(rb0_int_callback_t cb_to_unreg);
+#endif
+
+#ifdef PIC16LIB_USE_PORTB_INT
+typedef void (*portb_int_callback_t)();
+int8_t register_portb_int_callback(portb_int_callback_t new_cb);
+int8_t unregister_portb_int_callback(portb_int_callback_t cb_to_unreg);
+#endif
+
+#ifdef PIC16LIB_USE_TIMER0_INT
+typedef void (*timer0_int_callback_t)();
+int8_t register_timer0_int_callback(timer0_int_callback_t new_cb);
+int8_t unregister_timer0_int_callback(timer0_int_callback_t cb_to_unreg);
+#endif
+
+
+
+/*FOSC is 4Mhz. Prescaler input it 1Mhz.
+ Because prescaler is 8, prescaler output f=125kHz.
+ So,the prescaler output period is 8uS.
+ Hence, we need 125 timer pulses to reach 1mS.
+ 8uS*125 = 1mS*/
+ #define BIT_TOGGLE(x) (x^=1)
+
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+#ifdef PIC16LIB_USE_RB0_INT
+rb0_int_callback_t rb0_int_callback_list[MAX_INT_CALLBACK_NUM];
+#endif
+
+#ifdef PIC16LIB_USE_PORTB_INT
+portb_int_callback_t portb_int_callback_list[MAX_INT_CALLBACK_NUM];
+#endif
+
+#ifdef PIC16LIB_USE_TIMER0_INT
+timer0_int_callback_t timer0_int_callback_list[MAX_INT_CALLBACK_NUM];
+#endif
+
+
+#if defined(PIC16LIB_USE_RB0_INT) || defined(PIC16LIB_USE_PORTB_INT) || defined(PIC16LIB_USE_TIMER0_INT)
+static void interrupt global_isr_handler()
+{
+#ifdef PIC16LIB_USE_RB0_INT
+    if(REG_INTCON_UNION.bits.INTF)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL != rb0_int_callback_list[cb_index])
+            {
+                rb0_int_callback_list[cb_index]();
+            }
+        }
+        BIT_TOGGLE(REG_OPTION_UNION.bits.INTEDG);
+        REG_INTCON_UNION.bits.INTF=INT_FLAG_CLEAR;
+    }
+#endif
+#ifdef PIC16LIB_USE_PORTB_INT
+    if(REG_INTCON_UNION.bits.RBIF)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL != portb_int_callback_list[cb_index])
+            {
+                portb_int_callback_list[cb_index]();
+            }
+        }
+        BIT_TOGGLE(REG_OPTION_UNION.bits.INTEDG);
+        REG_INTCON_UNION.bits.RBIF=INT_FLAG_CLEAR;
+    }
+#endif
+#ifdef PIC16LIB_USE_TIMER0_INT
+    if(REG_INTCON_UNION.bits.T0IF)
+    {
+        REG_INTCON_UNION.bits.T0IF=INT_FLAG_CLEAR;
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL != timer0_int_callback_list[cb_index])
+            {
+                timer0_int_callback_list[cb_index]();
+            }
+        }
+    }
+#endif
+}
+#endif
+
+#ifdef PIC16LIB_USE_RB0_INT
+int8_t register_rb0_int_callback(rb0_int_callback_t new_cb)
+{
+    if(NULL != new_cb)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL == rb0_int_callback_list[cb_index])
+            {
+                rb0_int_callback_list[cb_index]=new_cb;
+            }
+        }
+        if(MAX_INT_CALLBACK_NUM == cb_index)
+        {
+            return PIC16LIB_ERROR_CB_ALREADY_REGISTERED; //All callbacks are already registered
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return 0;
+}
+
+int8_t unregister_rb0_int_callback(rb0_int_callback_t cb_to_unreg)
+{
+    if(NULL != cb_to_unreg)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(cb_to_unreg == rb0_int_callback_list[cb_index])
+            {
+                rb0_int_callback_list[cb_index]=NULL;
+            }
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return PIC16LIB_ERROR_NONE;
+}
+#endif
+#ifdef PIC16LIB_USE_PORTB_INT
+int8_t register_portb_int_callback(portb_int_callback_t new_cb)
+{
+    if(NULL != new_cb)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL == portb_int_callback_list[cb_index])
+            {
+                portb_int_callback_list[cb_index]=new_cb;
+            }
+        }
+        if(MAX_INT_CALLBACK_NUM == cb_index)
+        {
+            return PIC16LIB_ERROR_CB_ALREADY_REGISTERED; //All callbacks are already registered
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return PIC16LIB_ERROR_NONE;
+}
+ 
+ 
+ 
+int8_t unregister_portb_int_callback(portb_int_callback_t cb_to_unreg)
+{
+    if(NULL != cb_to_unreg)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(cb_to_unreg == portb_int_callback_list[cb_index])
+            {
+                portb_int_callback_list[cb_index]=NULL;
+            }
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return PIC16LIB_ERROR_NONE;
+}
+#endif
+#ifdef PIC16LIB_USE_TIMER0_INT
+int8_t register_timer0_int_callback(timer0_int_callback_t new_cb)
+{
+    if(NULL != new_cb)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(NULL == timer0_int_callback_list[cb_index])
+            {
+                timer0_int_callback_list[cb_index]=new_cb;
+            }
+        }
+        if(MAX_INT_CALLBACK_NUM == cb_index)
+        {
+            return PIC16LIB_ERROR_CB_ALREADY_REGISTERED; //All callbacks are already registered
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return PIC16LIB_ERROR_NONE;
+}
+ 
+ 
+ 
+int8_t unregister_timer0_int_callback(timer0_int_callback_t cb_to_unreg)
+{
+    if(NULL != cb_to_unreg)
+    {
+        uint8_t cb_index=0;
+        for(cb_index=0;cb_index<MAX_INT_CALLBACK_NUM; cb_index++)
+        {
+            if(cb_to_unreg == timer0_int_callback_list[cb_index])
+            {
+                timer0_int_callback_list[cb_index]=NULL;
+            }
+        }
+    }
+    else
+    {
+        return PIC16LIB_ERROR_CB_NULL; // Callback is NULL
+    }
+    return PIC16LIB_ERROR_NONE;
+}
+#endif
+
+
+----------------------------------------------------------------------------------------------------------------------------
 #define TIMER0_VAL_FOR_1MS  (0)
 
 static void milisecond_event_callback()
