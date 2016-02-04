@@ -1,0 +1,43 @@
+#define TIMER0_VAL_FOR_1MS  (0)
+
+static void milisecond_event_callback()
+{
+       REG_TIMER0_UNION.count = TIMER0_ASSIGN_CNT(TIMER0_VAL_FOR_1MS);
+  
+}
+
+void main() {
+    REG_TRISB_UNION.port = TRIS_PORT_OUTPUT;
+    REG_TRISB_UNION.pins.pin1 = TRIS_PIN_INPUT;
+    REG_TRISB_UNION.pins.pin2 = TRIS_PIN_INPUT;
+    REG_PORTB_UNION.port = PORT_ALL_LOW;
+    REG_OPTION_UNION.bits.T0CS = T0CS_SOURCE_INTERNAL_CLOCK;
+    REG_OPTION_UNION.bits.PSA = PSA_ASSIGN_TO_TIMER0;
+    REG_OPTION_UNION.bits.PS = PS_TMR0_RATE_DIVIDE_256;
+    REG_INTCON_UNION.value = INT_DISABLE_ALL;
+    while(1)
+    {
+       REG_PORTB_UNION.pins.pin7 = 1;
+	 if(REG_PORTB_UNION.pins.pin1 == 1 && REG_PORTB_UNION.pins.pin2 == 1)
+	 {
+	    if(REG_PORTB_UNION.pins.pin0 == 0)
+	       {
+		  
+		  REG_INTCON_UNION.bits.T0IF = 0;
+                   int count = 0;
+		   while(count < 20)
+		    if(REG_INTCON_UNION.bits.T0IF)
+                    {
+                     count++;
+                     register_timer0_int_callback(milisecond_event_callback);
+                     REG_INTCON_UNION.bits.T0IF = 0;
+                    } 
+		    REG_PORTB_UNION.pins.pin0 = 1;
+		    REG_INTCON_UNION.value = INT_DISABLE_ALL;
+                 
+	        }
+	   }
+	  else 
+		REG_PORTB_UNION.pins.pin0 = 0;    	  
+      }
+}
